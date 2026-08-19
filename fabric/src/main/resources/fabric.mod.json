@@ -18,6 +18,9 @@
     "entrypoints": {
         "client": [
             "com.diontryban.shuffle.client.ShuffleClientFabric"
+        ],
+        "modmenu": [
+            "com.diontryban.shuffle.client.ShuffleModMenu"
         ]
     },
     "mixins": [
@@ -25,8 +28,9 @@
         "${mod_id}.fabric.mixins.json"
     ],
     "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
         "minecraft": "^${minecraft_version}",
-        "ash_api": "^${ash_version}"
+        "fabric-api": "*"
     },
     "recommends": {
         "modmenu": "^${modmenu_version}"

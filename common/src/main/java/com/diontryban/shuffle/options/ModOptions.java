@@ -17,16 +17,13 @@
  * along with Shuffle. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.diontryban.shuffle;
+package com.diontryban.shuffle.options;
 
-import com.diontryban.shuffle.options.ModOptionsManager;
-import com.diontryban.shuffle.options.ShuffleOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.gson.annotations.SerializedName;
 
-public class Shuffle {
-    public static final String MOD_ID = "shuffle";
-    public static final String MOD_NAME = "Shuffle";
-    public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
-    public static final ModOptionsManager<ShuffleOptions> OPTIONS = new ModOptionsManager<>(MOD_ID, ShuffleOptions.class);
+public abstract class ModOptions {
+    @SerializedName("version")
+    protected int version = getVersion();
+
+    protected abstract int getVersion();
 }

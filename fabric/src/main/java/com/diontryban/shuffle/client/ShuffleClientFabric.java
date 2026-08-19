@@ -19,11 +19,31 @@
 
 package com.diontryban.shuffle.client;
 
+import com.diontryban.shuffle.Shuffle;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
+import org.lwjgl.glfw.GLFW;
 
 public class ShuffleClientFabric implements ClientModInitializer {
+    public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
+            Identifier.fromNamespaceAndPath(Shuffle.MOD_ID, "shuffle")
+    );
+
     @Override
     public void onInitializeClient() {
-        ShuffleClient.init();
+        ShuffleClient.keyMapping = KeyMappingHelper.registerKeyMapping(new KeyMapping(
+                "key.shuffle.shuffle",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_R,
+                CATEGORY
+        ));
+
+        ClientTickEvents.START_CLIENT_TICK.register(ShuffleClient::onClientTickPre);
+        UseBlockCallback.EVENT.register(ShuffleClient::onUseBlock);
     }
 }

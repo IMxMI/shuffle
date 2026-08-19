@@ -19,17 +19,11 @@
 
 package com.diontryban.shuffle.client;
 
-import com.diontryban.ash_api.client.event.ClientTickEvent;
-import com.diontryban.ash_api.client.gui.screens.ModOptionsScreenRegistry;
-import com.diontryban.ash_api.client.input.KeyMappingRegistry;
-import com.diontryban.ash_api.event.UseBlockEvent;
 import com.diontryban.shuffle.Shuffle;
-import com.diontryban.shuffle.client.gui.screens.ShuffleOptionsScreen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.WeightedList;
@@ -41,51 +35,38 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.function.BiFunction;
 
 public class ShuffleClient {
-    private static KeyMapping keyMapping;
+    public static KeyMapping keyMapping;
 
     private static boolean shuffle = false;
     private static boolean keyWasDown = false;
     private static int slotToSwitchTo = -1;
 
-    public static void init() {
-        keyMapping = KeyMappingRegistry.register(
-                ResourceLocation.fromNamespaceAndPath(Shuffle.MOD_ID, "shuffle"),
-                GLFW.GLFW_KEY_R,
-                Shuffle.MOD_ID
-        );
-
-        ModOptionsScreenRegistry.register(Shuffle.OPTIONS, ShuffleOptionsScreen::new);
-        ClientTickEvent.Pre.register(ShuffleClient::onClientTickPre);
-        UseBlockEvent.register(ShuffleClient::onUseBlock);
-    }
-
-    private static void onClientTickPre(Minecraft client) {
+    public static void onClientTickPre(Minecraft client) {
         final var player = client.player;
         if (player == null) { return; }
 
-        if (keyMapping.isDown() && !keyWasDown) {
+        if (keyMapping != null && keyMapping.isDown() && !keyWasDown) {
             keyWasDown = true;
 
             shuffle = !shuffle;
             if (shuffle) {
-                player.displayClientMessage(Component.translatable("message.shuffle.enable"), true);
+                player.sendOverlayMessage(Component.translatable("message.shuffle.enable"));
 
                 if (Shuffle.OPTIONS.get().playSoundEffects) {
                     player.playSound(SoundEvents.TRIPWIRE_CLICK_OFF, 0.5f, 1.0f);
                 }
             } else {
-                player.displayClientMessage(Component.translatable("message.shuffle.disable"), true);
+                player.sendOverlayMessage(Component.translatable("message.shuffle.disable"));
 
                 if (Shuffle.OPTIONS.get().playSoundEffects) {
                     player.playSound(SoundEvents.TRIPWIRE_CLICK_ON, 0.5f, 1.0f);
                 }
             }
-        } else if (!keyMapping.isDown() && keyWasDown) {
+        } else if (keyMapping != null && !keyMapping.isDown() && keyWasDown) {
             keyWasDown = false;
         }
 
@@ -95,13 +76,13 @@ public class ShuffleClient {
         }
     }
 
-    private static InteractionResult onUseBlock(
+    public static InteractionResult onUseBlock(
             Player player,
             Level level,
             InteractionHand hand,
             BlockHitResult hitResult
     ) {
-        if (shuffle && level.isClientSide && !player.isSpectator()) {
+        if (shuffle && level.isClientSide() && !player.isSpectator()) {
             final var itemInHand = player.getItemInHand(hand).getItem();
             // Only shuffle if the held item is a block, therefore it's being placed.
             if (Block.byItem(itemInHand) != Blocks.AIR) {
@@ -109,9 +90,9 @@ public class ShuffleClient {
 
                 // Check whether to use weighted or random logic
                 if (Shuffle.OPTIONS.get().useWeightedRandom) {
-                    slotToSwitchTo = switchSlotWeighted(items, level.random);
+                    slotToSwitchTo = switchSlotWeighted(items, level.getRandom());
                 } else {
-                    slotToSwitchTo = switchSlotRandom(items, level.random);
+                    slotToSwitchTo = switchSlotRandom(items, level.getRandom());
                 }
             }
         }

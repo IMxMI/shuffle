@@ -1,34 +1,12 @@
 plugins {
     id 'multiloader-common'
-    id 'net.neoforged.moddev'
-}
-
-neoForge {
-    neoFormVersion = project.neoform_version
-
-    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
-    if (at.exists()) {
-        accessTransformers.from(at.absolutePath)
-    }
-
-    parchment {
-        minecraftVersion = project.parchment_minecraft_version
-        mappingsVersion = project.parchment_version
-    }
 }
 
 dependencies {
+    compileOnly "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-
-    // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
     compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
     annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.3.5'
-
-    if (project.ash_version != "") {
-        compileOnly group: 'com.diontryban.ash_api', name: 'ash_api-common', version: project.ash_version
-    }
-
-
 }
 
 configurations {
@@ -45,4 +23,11 @@ configurations {
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+tasks.named('compileJava', JavaCompile) {
+    enabled = false
+}
+tasks.named('javadoc', Javadoc) {
+    enabled = false
 }

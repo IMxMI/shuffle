@@ -17,16 +17,16 @@
  * along with Shuffle. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.diontryban.shuffle;
+package com.diontryban.shuffle.client;
 
-import com.diontryban.shuffle.options.ModOptionsManager;
-import com.diontryban.shuffle.options.ShuffleOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.diontryban.shuffle.Shuffle;
+import com.diontryban.shuffle.client.gui.screens.ShuffleOptionsScreen;
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 
-public class Shuffle {
-    public static final String MOD_ID = "shuffle";
-    public static final String MOD_NAME = "Shuffle";
-    public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
-    public static final ModOptionsManager<ShuffleOptions> OPTIONS = new ModOptionsManager<>(MOD_ID, ShuffleOptions.class);
+public class ShuffleModMenu implements ModMenuApi {
+    @Override
+    public ConfigScreenFactory<?> getModConfigScreenFactory() {
+        return parent -> new ShuffleOptionsScreen(Shuffle.OPTIONS, parent);
+    }
 }

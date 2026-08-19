@@ -19,7 +19,6 @@
 
 package com.diontryban.shuffle.options;
 
-import com.diontryban.ash_api.options.ModOptions;
 import com.google.gson.annotations.SerializedName;
 
 public class ShuffleOptions extends ModOptions {

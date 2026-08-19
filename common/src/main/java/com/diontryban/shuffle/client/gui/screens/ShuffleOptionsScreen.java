@@ -19,43 +19,53 @@
 
 package com.diontryban.shuffle.client.gui.screens;
 
-import com.diontryban.ash_api.client.gui.screens.ModOptionsScreen;
-import com.diontryban.ash_api.options.ModOptionsManager;
 import com.diontryban.shuffle.Shuffle;
 import com.diontryban.shuffle.client.gui.widgets.HotbarLockButtonsWidget;
+import com.diontryban.shuffle.options.ModOptionsManager;
 import com.diontryban.shuffle.options.ShuffleOptions;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ShuffleOptionsScreen extends ModOptionsScreen<ShuffleOptions> {
+public class ShuffleOptionsScreen extends OptionsSubScreen {
+    private final ModOptionsManager<ShuffleOptions> options;
+
     public ShuffleOptionsScreen(@NotNull ModOptionsManager<ShuffleOptions> options, Screen parent) {
-        super(Component.literal(Shuffle.MOD_NAME), options, parent);
+        super(parent, Minecraft.getInstance().options, Component.literal(Shuffle.MOD_NAME));
+        this.options = options;
     }
 
     @Override
     protected void addOptions() {
-        if (list == null) { return; }
+        if (this.list == null) { return; }
 
         this.list.addBig(OptionInstance.createBoolean(
                 "shuffle.options.use_weighted_random",
                 value -> Tooltip.create(Component.translatable("shuffle.options.use_weighted_random.tooltip")),
-                options.get().useWeightedRandom,
-                value -> options.get().useWeightedRandom = value
+                this.options.get().useWeightedRandom,
+                value -> this.options.get().useWeightedRandom = value
         ));
         this.list.addBig(OptionInstance.createBoolean(
                 "shuffle.options.play_sound_effects",
                 value -> Tooltip.create(Component.translatable("shuffle.options.play_sound_effects.tooltip")),
-                options.get().playSoundEffects,
-                value -> options.get().playSoundEffects = value
+                this.options.get().playSoundEffects,
+                value -> this.options.get().playSoundEffects = value
         ));
-        this.list.addSmall(List.of(new MultiLineTextWidget(0, 5, CommonComponents.EMPTY, font))); //spacing
-        this.list.addSmall(List.of(new HotbarLockButtonsWidget(65, options)));
+        this.list.addSmall(List.of(new MultiLineTextWidget(0, 5, CommonComponents.EMPTY, font))); // spacing
+        this.list.addSmall(List.of(new HotbarLockButtonsWidget(65, this.options)));
+    }
+
+    @Override
+    public void onClose() {
+        this.options.save();
+        super.onClose();
     }
 }
